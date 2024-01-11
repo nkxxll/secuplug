@@ -113,52 +113,72 @@ class TextWriter:
             name (str): The name of the file where the Markdown document will be written.
             endl (str): The end line character (default "\\n")
         """
-        self._state = ""
+        self._text = ""
         self._name = name
         self._endl = endl
+
+    def __str__(self):
+        return self._text
+
+    def __repr__(self):
+        return f"TextWriter(text={self._text}, name={self._name}, endl={self._endl})"
+
+    def __add__(self, other: "TextWriter | str") -> "TextWriter":
+        text = self._text + str(other)
+        ret = TextWriter(self._name, self._endl)
+        ret._text = text
+        return ret
 
     @property
     def name(self):
         return self._name
 
+    @property
+    def text(self):
+        return self._text
+
     @name.setter
     def name(self, value: str) -> None:
         self._name = value
 
+    @text.setter
+    def text(self, value: "TextWriter | str") -> None:
+        self._text = str(value)
+
     def add_header_n(self, n: int, header: str, end: str | None = None) -> "TextWriter":
-        self._state += f"{'#' * n} {header}{end if end is not None else self._endl}"
-        self._state += f"{end if end is not None else self._endl}"
+        self._text += f"{'#' * n} {header}{end if end is not None else self._endl}"
+        self._text += f"{end if end is not None else self._endl}"
         return self
 
     def add_header_one(self, header: str, end: str | None = None) -> "TextWriter":
-        self._state += f"# {header}{end if end is not None else self._endl}"
-        self._state += f"{end if end is not None else self._endl}"
+        self._text += f"# {header}{end if end is not None else self._endl}"
+        self._text += f"{end if end is not None else self._endl}"
         return self
 
     def add_header_two(self, header: str, end: str | None = None) -> "TextWriter":
-        self._state += f"## {header}{end if end is not None else self._endl}"
-        self._state += f"{end if end is not None else self._endl}"
+        self._text += f"## {header}{end if end is not None else self._endl}"
+        self._text += f"{end if end is not None else self._endl}"
         return self
 
     def add_header_three(self, header: str, end: str | None = None) -> "TextWriter":
-        self._state += f"### {header}{end if end is not None else self._endl}"
-        self._state += f"{end if end is not None else self._endl}"
+        self._text += f"### {header}{end if end is not None else self._endl}"
+        self._text += f"{end if end is not None else self._endl}"
         return self
 
     def add_paragraph(self, text: str, end: str | None = None):
-        self._state += text
-        self._state += f"{end if end is not None else self._endl}"
-        self._state += self._endl
+        self._text += text
+        self._text += f"{end if end is not None else self._endl}"
+        self._text += self._endl
         return self
 
     def add_horizontal_rule(self):
-        self._state += f"---{self._endl}"
+        self._text += f"---{self._endl}"
         return self
 
     def add_code_block(
         self, code: str, highlighting: str | SyntaxHighlighting | None = None
     ) -> "TextWriter":
-        self._state += (
+        self._text += (
             "```"
             + (
                 highlighting
@@ -177,23 +197,23 @@ class TextWriter:
         self, items: list[str], ordered: bool = False, end: str | None = None
     ) -> "TextWriter":
         if ordered:
-            self._state += (
+            self._text += (
                 f"{end if end is not None else self._endl}".join(
                     [f"{idx + 1}. {item}" for (idx, item) in enumerate(items)]
                 )
                 + f"{end if end is not None else self._endl}"
             )
         else:
-            self._state += (
+            self._text += (
                 f"{end if end is not None else self._endl}".join(
                     [f"- {item}" for item in items]
                 )
                 + f"{end if end is not None else self._endl}"
             )
-        self._state += self._endl
+        self._text += self._endl
         return self
 
     def write_to_file(self) -> None:
         with open(self._name, mode="w") as f:
-            f.write(self._state)
+            f.write(self._text)
             logger.info(msg=f"Text is written to the file: {self._name}")

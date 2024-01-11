@@ -6,6 +6,26 @@ FILE_PATH = "./tests/tw_test_files/"
 
 
 class TestTextWriter(TestCase):
+    def test_add_tw_to_tw(self):
+        name = FILE_PATH + "test_add_tw_to_tw.txt"
+        expected = "# header\n\nThis is a test\n"
+        tw1 = TextWriter(name).add_header_one("header")
+        tw2 = TextWriter(name).add_paragraph("This is a test", end="")
+        (tw1 + tw2).write_to_file()
+        with open(name, "r") as f:
+            text = f.read()
+        self.assertEqual(text, expected)
+
+    def test_add_tw_to_str(self):
+        name = FILE_PATH + "test_add_tw_to_tw.txt"
+        expected = "# header\n\nThis is a test\n"
+        tw1 = TextWriter(name).add_header_one("header")
+        string = "This is a test\n"
+        (tw1 + string).write_to_file()
+        with open(name, "r") as f:
+            text = f.read()
+        self.assertEqual(text, expected)
+
     def test_header_one(self):
         name = FILE_PATH + "test_header.txt"
         expected = "# This is a test\n\n"
