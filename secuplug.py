@@ -51,16 +51,14 @@ class SecuTools:
             list[int]: All indices of the search string in the text. (-1 if not found)
         """
         res = []
-        while (idx := text.find(string)):
+        while idx := text.find(string):
             res.append(idx)
-            text = text[idx + 1:]
+            text = text[idx + 1 :]
         return res
 
 
-
-
 class SecuPlug(ABC):
-    """ Abstract SecuPlug class
+    """Abstract SecuPlug class
 
     Abstract base class for a plugin that runs a command in the command line
     and processes the output.
