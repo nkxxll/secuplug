@@ -1,6 +1,5 @@
 import subprocess
 from abc import ABC, abstractmethod
-from typing import override
 
 
 class Command:
@@ -15,8 +14,27 @@ class Command:
         self._command: str = command
         self._args: list[str] = args
 
+    @property
+    def command(self) -> str:
+        return self._command
+
+    @command.setter
+    def command(self, value: str) -> None:
+        self._command = value
+
+    @property
+    def args(self) -> list[str]:
+        return self._args
+
+    @args.setter
+    def args(self, value: list[str]) -> None:
+        self._args = value
+
     def __str__(self):
-        return self._command + " " + " ".join(self._args) if self._args else ""
+        return self._command + (" " + " ".join(self._args) if self._args else "")
+
+    def __repr__(self) -> str:
+        return f"Command(command={self._command}, args={self._args})"
 
 
 class SecuPlug(ABC):
@@ -33,13 +51,16 @@ class SecuPlug(ABC):
     - execute(command): External method to execute a command and process the output.
     """
 
+    def __init__(self, command: Command = Command("")):
+        self._command = command
+
     @property
     @abstractmethod
     def command(self):
         """
         Abstract property for the command to be executed.
         """
-        return Command("")
+        return self._command
 
     @classmethod
     @abstractmethod
@@ -78,38 +99,31 @@ class SecuPlug(ABC):
             print(f"Error running command: {e}")
             return ""
 
-    
-    @classmethod
-    def execute_command(cls):
+    def execute_command(self):
         """
         External method to execute a command and process the output.
 
         Parameters:
         - command (str): The command to be executed.
         """
-        output = cls._run_command(cls.command)
-        cls._process_output(output)
+        output = self._run_command(self.command)
+        self._process_output(output)
 
 
 # Example usage of the abstract class
 class LS_LA(SecuPlug):
     @property
-    @override
     def command(self):
-        return Command("ls", ["-l, -a"])
+        return Command("ls", ["-l", "-a"])
 
     @classmethod
-    @override
     def _process_output(cls, output):
         print("Processing output:")
         print(output.upper())
 
     @classmethod
-    @override
     def _run_command(cls, command):
         return super()._run_command(command)
 
-    @classmethod
-    @override
-    def execute_command(cls):
+    def execute_command(self):
         super().execute_command()
